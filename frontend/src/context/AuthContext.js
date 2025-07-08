@@ -1,0 +1,37 @@
+import React, { createContext, useState, useEffect } from 'react';
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
+
+  useEffect(() => {
+    if (token) {
+      // Optionally decode token to get user info, or fetch profile from backend
+      setUser(JSON.parse(localStorage.getItem('user')));
+    } else {
+      setUser(null);
+    }
+  }, [token]);
+
+  const login = (userData, jwt) => {
+    setUser(userData);
+    setToken(jwt);
+    localStorage.setItem('token', jwt);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, token, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}; 
